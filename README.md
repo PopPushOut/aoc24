@@ -1,3 +1,3 @@
 
 
-![Elf](./elf.svg)
+![Elf](./elf_crazy.svg)
