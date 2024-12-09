@@ -1,6 +1,7 @@
 import requests
 import time
 
+
 def read_input():
     url = "https://adventofcode.com/2024/day/9/input"
     headers = {
@@ -29,14 +30,6 @@ def parse_input(input, output):
                 
     return output
 
-operations1 = {
-    '+': lambda x, y: x + y,
-    '*': lambda x, y: x * y,
-}
-
-def calculate(numbers, result, operations):
-   
-    return False
 def part1(memory):
     sum = 0
     # iterate backwards
@@ -79,22 +72,50 @@ def part2(memory):
     idx = 0
     for i in range(len(memory)):
         if memory[i] != '.':
-            if previous == '.':
+            if previous == '.' or previous != memory[i]:
                 idx = i
                 memory_blocks[idx] = 1
             else:
                 memory_blocks[idx] += 1
         previous = memory[i]
     print(memory_blocks)
+
+    # iterate through object keys in reverse
+    for memory_loc in reversed(memory_blocks):
+        mem_block = memory_blocks[memory_loc]
+        #print(f'location: {memory_loc} block_size: {mem_block}')
+        # find where it fitys in fragment block
+        for fragment_loc in fragment_block:
+            f_block = fragment_block[fragment_loc]
+            if memory_loc > fragment_loc and mem_block <= f_block:
+                if(mem_block == f_block):
+                    del fragment_block[fragment_loc]
+                else:
+                    fragment_block = {(fragment_loc + mem_block) if k == fragment_loc else k:v for k,v in fragment_block.items()}
+                    fragment_block[(fragment_loc + mem_block)] = f_block - mem_block
+
+                #print(f'fragment_loc: {fragment_loc} fragment_block: {fragment_block}')
+
+                memory[fragment_loc:fragment_loc + mem_block] = [memory[memory_loc]] * mem_block
+                # fill memory from memory_loc to memory_loc + memory_blocks[memory_loc] with '.'
+                memory[memory_loc:memory_loc + mem_block] = ['.'] * mem_block
+                
+                break
+
+    print(memory)
+    for i in range(len(memory)):
+        if memory[i] == '.':
+            continue
+        sum += int(memory[i]) * i
     return sum
     
 #add execution time in milliseconds with 3 decimal points
 
-#input = read_input()
-input = test_input
+input = read_input()
+#input = test_input
 memory = []
 parse_input(input, memory)
-
+print(memory)
 start_time = time.time()
 #print(part1(memory))
 print("--- %.2f milliseconds ---" % ((time.time() - start_time) * 1000))
